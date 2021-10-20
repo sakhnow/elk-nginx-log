@@ -18,6 +18,7 @@ podman_up_elastic: podman_pod_create
 	|| podman run --rm -d \
 	--pod ${POD_NAME} \
 	--name=${POD_NAME}-elastic \
+	--tz=local \
 	--user 1000:1000 \
 	--env http.host=0.0.0.0 \
 	--env http.cors.enabled=true \
@@ -39,6 +40,7 @@ podman_up_kibana: podman_pod_create
 	|| podman run --rm -d \
 	--pod ${POD_NAME} \
 	--name=${POD_KIBANA} \
+	--tz=local \
 	--env ELASTIC_PASSWORD=${ELASTIC_PASSWORD} \
 	-v ./config/kibana:/usr/share/kibana/config:Z \
 	docker.elastic.co/kibana/kibana:${ELK_VERSION}
@@ -49,6 +51,7 @@ podman_up_logstash: podman_pod_create
 	|| podman run --rm -d \
 	--pod ${POD_NAME} \
 	--name=${POD_NAME}-logstash \
+	--tz=local \
 	-v ./config/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml:Z \
 	-v ./config/logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml:Z \
 	-v ./config/logstash/pipelines:/usr/share/logstash/config/pipelines:Z \
@@ -61,7 +64,11 @@ podman_up_nginx: podman_pod_create
 	|| podman run --rm -d \
 	--pod ${POD_NAME} \
 	--name=${POD_NGINX} \
+	--tz=local \
 	-v ./config/nginx/nginx.conf:/etc/nginx/nginx.conf:Z \
 	nginx
 
 podman_up: podman_up_elastic podman_up_kibana podman_up_logstash podman_up_nginx
+
+podman_stop:
+	podman pod stop ${POD_NAME}
